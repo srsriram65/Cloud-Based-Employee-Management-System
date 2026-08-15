@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud-Based Employee Management System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- MAIN LOADING SCREEN -->
+    <div id="app-loading" class="app-loading-screen">
+        <div class="loading-spinner-wrapper">
+            <div class="cloud-loader">
+                <i class="fa-solid fa-cloud-arrow-up cloud-icon-pulse"></i>
+            </div>
+            <p>Connecting to Cloud Services...</p>
+        </div>
+    </div>
+
+    <!-- ==================== 1. LOGIN SCREEN ==================== -->
+    <div id="login-view" class="login-view-container hidden">
+        <div class="login-card-wrapper">
+            <div class="login-card-glow"></div>
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="cloud-logo-badge">
+                        <i class="fa-solid fa-cloud"></i>
+                    </div>
+                    <h1>Cloud EMS</h1>
+                    <p>Employee Management System Portal</p>
+                </div>
+                
+                <form id="login-form" novalidate>
+                    <div class="form-group">
+                        <label for="login-email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="fa-regular fa-envelope input-icon"></i>
+                            <input type="email" id="login-email" placeholder="admin@organization.com" required autocomplete="email">
+                        </div>
+                        <span class="field-error" id="email-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
+                            <button type="button" id="toggle-password" class="password-toggle-btn">
+                                <i class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                        <span class="field-error" id="password-error"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="login-btn">
+                        <span>Sign In</span>
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <p><i class="fa-solid fa-shield-halved"></i> Secured by Firebase Authentication</p>
+                    <span class="login-hint">Demo Email: <code>admin@cloudems.com</code> | Pass: <code>admin123</code></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 2. MAIN DASHBOARD VIEW ==================== -->
+    <div id="dashboard-view" class="dashboard-container hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fa-solid fa-cloud-arrow-up brand-icon"></i>
+                <div class="brand-text">
+                    <h2>Cloud EMS</h2>
+                    <span>Cloud Console</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-target="section-overview">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-target="section-employees">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>Employees</span>
+                </a>
+                <a href="#" class="nav-item" data-target="section-viva">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>Viva Helper</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-profile">
+                <div class="profile-avatar">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <div class="profile-details">
+                    <span class="profile-role">Administrator</span>
+                    <span id="user-email-display" class="profile-email">admin@cloudems.com</span>
+                </div>
+                <button id="logout-btn" class="logout-btn" title="Sign Out">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT PANEL -->
+        <main class="main-panel">
+            
+            <!-- HEADER -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h1 id="page-title-display">Dashboard Overview</h1>
+                    <p id="page-desc-display">Real-time statistics & organization summary</p>
+                </div>
+                <div class="header-actions">
+                    <span class="cloud-status-badge online">
+                        <span class="status-dot"></span>
+                        <i class="fa-solid fa-wifi"></i> Connected to Firebase
+                    </span>
+                    <button class="btn btn-primary" id="quick-add-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Employee</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- SUB-SECTION 1: OVERVIEW -->
+            <section id="section-overview" class="content-section">
+                <!-- Statistics Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card blue">
+                        <div class="stat-card-glow"></div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-employees">0</h3>
+                            <p>Total Employees</p>
+                        </div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-card-glow"></div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-user-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-active-employees">0</h3>
+                            <p>Active Staff</p>
+                        </div>
+                    </div>
+                    <div class="stat-card red">
+                        <div class="stat-card-glow"></div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-user-slash"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-inactive-employees">0</h3>
+                            <p>Inactive Staff</p>
+                        </div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="stat-card-glow"></div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-sitemap"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-departments">0</h3>
+                            <p>Departments</p>
+                        </div>
+                    </div>
+                    <div class="stat-card gold">
+                        <div class="stat-card-glow"></div>
+                        <div class="stat-icon">
+                            <i class="fa-solid fa-user-tie"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="stat-managers">0</h3>
+                            <p>Managers & Leads</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activities & Mini Directory View -->
+                <div class="overview-grid">
+                    <div class="overview-panel chart-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-chart-simple"></i> Department Distribution</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div id="dept-bar-chart" class="dept-bar-chart">
+                                <!-- Bars will be dynamically injected here -->
+                                <p class="placeholder-text">Add employees to see department allocation</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="overview-panel logs-panel">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-clock-rotate-left"></i> System Highlights</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="quick-facts">
+                                <div class="fact-item">
+                                    <div class="fact-icon"><i class="fa-solid fa-server"></i></div>
+                                    <div class="fact-details">
+                                        <h4>Cloud Storage Service</h4>
+                                        <p>All database instances are synced securely with Firebase Cloud Firestore.</p>
+                                    </div>
+                                </div>
+                                <div class="fact-item">
+                                    <div class="fact-icon"><i class="fa-solid fa-shield"></i></div>
+                                    <div class="fact-details">
+                                        <h4>Access Security Control</h4>
+                                        <p>Firestore security rules apply to prevent unauthenticated data reads/writes.</p>
+                                    </div>
+                                </div>
+                                <div class="fact-item">
+                                    <div class="fact-icon"><i class="fa-solid fa-bolt"></i></div>
+                                    <div class="fact-details">
+                                        <h4>Real-Time Push Stream</h4>
+                                        <p>UI automatically updates on remote database modifications without page refreshes.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUB-SECTION 2: EMPLOYEES DIRECTORY -->
+            <section id="section-employees" class="content-section hidden">
+                <!-- Controls Bar -->
+                <div class="controls-bar">
+                    <!-- Search -->
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="employee-search" placeholder="Search employees by ID, Name, Email, Dept, Role...">
+                        <button id="clear-search-btn" class="clear-search-btn hidden" title="Clear Search">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Filters Group -->
+                    <div class="filter-controls">
+                        <div class="filter-group">
+                            <label for="filter-department"><i class="fa-solid fa-filter"></i> Department</label>
+                            <select id="filter-department">
+                                <option value="All">All Departments</option>
+                                <option value="HR">HR</option>
+                                <option value="IT">IT</option>
+                                <option value="Finance">Finance</option>
+                                <option value="Marketing">Marketing</option>
+                                <option value="Sales">Sales</option>
+                                <option value="Operations">Operations</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="filter-status"><i class="fa-solid fa-toggle-on"></i> Status</label>
+                            <select id="filter-status">
+                                <option value="All">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Container -->
+                <div class="table-container">
+                    <table class="employee-table" id="employee-table">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Joining Date</th>
+                                <th>Status</th>
+                                <th class="actions-column">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employee-table-body">
+                            <!-- Table Rows dynamically generated by JS -->
+                        </tbody>
+                    </table>
+
+                    <!-- Table Empty State -->
+                    <div id="table-empty-state" class="empty-state hidden">
+                        <i class="fa-solid fa-users-slash"></i>
+                        <h3>No Employees Found</h3>
+                        <p>No records match your criteria. Add a new employee or adjust your search filters.</p>
+                        <button class="btn btn-secondary btn-sm" id="reset-filters-btn">Clear Filters</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SUB-SECTION 3: VIVA HELPER -->
+            <section id="section-viva" class="content-section hidden">
+                <div class="viva-container">
+                    <div class="viva-sidebar-topics">
+                        <button class="viva-topic-btn active" data-viva="viva-architecture">
+                            <i class="fa-solid fa-diagram-project"></i> Cloud Architecture
+                        </button>
+                        <button class="viva-topic-btn" data-viva="viva-rules">
+                            <i class="fa-solid fa-key"></i> Firestore Security Rules
+                        </button>
+                        <button class="viva-topic-btn" data-viva="viva-qa">
+                            <i class="fa-solid fa-question-circle"></i> Viva QA Prep
+                        </button>
+                    </div>
+
+                    <div class="viva-content-wrapper">
+                        <!-- Architecture Content -->
+                        <div id="viva-architecture" class="viva-tab-content">
+                            <h3>Cloud Computing Project Architecture</h3>
+                            <p>This project demonstrates a <strong>Serverless Cloud-Based Web App</strong>. The web client directly communicates with Google Firebase managed servers.</p>
+                            
+                            <div class="diagram-box">
+                                <div class="diagram-node user">
+                                    <i class="fa-solid fa-user"></i>
+                                    <span>Client Browser (UI)</span>
+                                </div>
+                                <div class="diagram-arrow"><i class="fa-solid fa-right-left"></i></div>
+                                <div class="diagram-node auth">
+                                    <i class="fa-solid fa-shield"></i>
+                                    <span>Firebase Auth</span>
+                                </div>
+                                <div class="diagram-arrow"><i class="fa-solid fa-right-left"></i></div>
+                                <div class="diagram-node firestore">
+                                    <i class="fa-solid fa-database"></i>
+                                    <span>Cloud Firestore</span>
+                                </div>
+                            </div>
+
+                            <ul class="arch-bullets">
+                                <li><strong>Cloud Auth:</strong> Authenticates organization users securely without local server storage.</li>
+                                <li><strong>NoSQL Firestore:</strong> Houses a document-based cloud database (schema-less, horizontally scalable).</li>
+                                <li><strong>Direct Sync:</strong> Listens to real-time sync socket streams for zero-refresh UI updates.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Security Rules Content -->
+                        <div id="viva-rules" class="viva-tab-content hidden">
+                            <h3>Firestore Security Rules</h3>
+                            <p>Security rules define who has access to read and write records in our Cloud database. Copy these into your Firebase console:</p>
+                            <pre class="code-block"><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /employees/{employeeId} {
+      // Allow read/write access to any authenticated user
+      allow read, write: if request.auth != null;
+    }
+  }
+}</code></pre>
+                            <div class="rules-explanation">
+                                <h4><i class="fa-solid fa-circle-info"></i> Rationale:</h4>
+                                <p>This rule ensures that any database request must carry a valid JSON Web Token (JWT) indicating the user is logged in. Unauthenticated users (non-logged-in visitors) trying to bypass the client-side code will be blocked by Firestore's server-side access control lists (ACL).</p>
+                            </div>
+                        </div>
+
+                        <!-- Viva QA Content -->
+                        <div id="viva-qa" class="viva-tab-content hidden">
+                            <h3>Viva Q&A Quick Reference</h3>
+                            
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span>Q1: What cloud model is used here?</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="accordion-body">
+                                    <p><strong>Answer:</strong> Backend-as-a-Service (BaaS), a subset of PaaS (Platform-as-a-Service). We utilize Firebase for database and authentication without managing servers, databases, or writing backend scripts.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span>Q2: What is Cloud Firestore?</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="accordion-body">
+                                    <p><strong>Answer:</strong> Cloud Firestore is a flexible, scalable NoSQL document database. Data is stored in <strong>documents</strong> containing key-value pairs, which are organized into <strong>collections</strong>. There are no tables, rows, or foreign keys.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span>Q3: How does Firestore differ from a SQL database?</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="accordion-body">
+                                    <p><strong>Answer:</strong> Firestore is NoSQL. It does not require a predefined schema. It stores data as JSON-like documents, allows deep nested arrays/objects, offers automatic horizontal scaling, and has built-in real-time listener capabilities, whereas SQL databases like MySQL are schema-bound, vertically scalable, and require a middleware server.</p>
+                                </div>
+                            </div>
+
+                            <div class="accordion-item">
+                                <div class="accordion-header">
+                                    <span>Q4: How does authentication work?</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="accordion-body">
+                                    <p><strong>Answer:</strong> Firebase Auth processes credentials (email/password) on secure Google servers, returns a JSON Web Token (JWT) to the client browser, and maintains the login state automatically in IndexedDB/LocalStorage. It securely transmits this JWT during Firestore calls to verify credentials against safety rules.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+
+    <!-- ==================== 3. MODALS ==================== -->
+
+    <!-- ADD/EDIT EMPLOYEE MODAL -->
+    <div id="employee-modal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Add New Employee</h3>
+                <button class="modal-close-btn" id="close-employee-modal-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="employee-form" novalidate>
+                <input type="hidden" id="form-mode" value="add"> <!-- 'add' or 'edit' -->
+                <input type="hidden" id="edit-doc-id" value=""> <!-- Firestore Document ID -->
+
+                <div class="modal-body">
+                    <div class="form-grid">
+                        
+                        <div class="form-group">
+                            <label for="emp-id">Employee ID *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-id-badge input-icon"></i>
+                                <input type="text" id="emp-id" placeholder="e.g. EMP001" required>
+                            </div>
+                            <span class="field-error" id="emp-id-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-fullname">Full Name *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-regular fa-user input-icon"></i>
+                                <input type="text" id="emp-fullname" placeholder="John Doe" required>
+                            </div>
+                            <span class="field-error" id="emp-fullname-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-email">Email Address *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-regular fa-envelope input-icon"></i>
+                                <input type="email" id="emp-email" placeholder="john.doe@org.com" required>
+                            </div>
+                            <span class="field-error" id="emp-email-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-phone">Phone Number *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-phone input-icon"></i>
+                                <input type="tel" id="emp-phone" placeholder="e.g. +91 9876543210" required>
+                            </div>
+                            <span class="field-error" id="emp-phone-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-department">Department *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-sitemap input-icon"></i>
+                                <select id="emp-department" required>
+                                    <option value="" disabled selected>Select Department</option>
+                                    <option value="HR">HR</option>
+                                    <option value="IT">IT</option>
+                                    <option value="Finance">Finance</option>
+                                    <option value="Marketing">Marketing</option>
+                                    <option value="Sales">Sales</option>
+                                    <option value="Operations">Operations</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <span class="field-error" id="emp-department-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-designation">Designation *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-user-tie input-icon"></i>
+                                <input type="text" id="emp-designation" placeholder="e.g. Lead Developer" required>
+                            </div>
+                            <span class="field-error" id="emp-designation-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-gender">Gender *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-venus-mars input-icon"></i>
+                                <select id="emp-gender" required>
+                                    <option value="" disabled selected>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Non-Binary">Non-Binary</option>
+                                    <option value="Prefer not to say">Prefer not to say</option>
+                                </select>
+                            </div>
+                            <span class="field-error" id="emp-gender-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-joining">Date of Joining *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-regular fa-calendar-check input-icon"></i>
+                                <input type="date" id="emp-joining" required>
+                            </div>
+                            <span class="field-error" id="emp-joining-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-salary">Monthly Salary ($) *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-wallet input-icon"></i>
+                                <input type="number" id="emp-salary" placeholder="e.g. 5000" min="1" required>
+                            </div>
+                            <span class="field-error" id="emp-salary-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="emp-status">Employment Status *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-toggle-on input-icon"></i>
+                                <select id="emp-status" required>
+                                    <option value="Active" selected>Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <span class="field-error" id="emp-status-error"></span>
+                        </div>
+
+                        <div class="form-group col-span-2">
+                            <label for="emp-address">Address *</label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-map-location-dot input-icon text-area-icon"></i>
+                                <textarea id="emp-address" rows="3" placeholder="Enter physical address..." required></textarea>
+                            </div>
+                            <span class="field-error" id="emp-address-error"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancel-employee-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-employee-btn">
+                        <span>Save Record</span>
+                        <i class="fa-regular fa-floppy-disk"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- VIEW DETAILS MODAL -->
+    <div id="details-modal" class="modal-overlay hidden">
+        <div class="modal-card detail-card-width">
+            <div class="modal-header">
+                <h3>Employee Profile Card</h3>
+                <button class="modal-close-btn" id="close-details-modal-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-card-layout">
+                    
+                    <div class="profile-card-left">
+                        <div class="profile-badge-avatar" id="detail-avatar">JD</div>
+                        <h2 id="detail-fullname">John Doe</h2>
+                        <span class="profile-badge-role" id="detail-designation">Lead Developer</span>
+                        <span class="status-badge" id="detail-status-badge">Active</span>
+                    </div>
+
+                    <div class="profile-card-right">
+                        <h4 class="details-divider-title">Primary Credentials</h4>
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <label><i class="fa-solid fa-id-card"></i> Employee ID</label>
+                                <span id="detail-id">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fa-solid fa-sitemap"></i> Department</label>
+                                <span id="detail-department">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fa-regular fa-envelope"></i> Email Address</label>
+                                <span id="detail-email">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fa-solid fa-phone"></i> Phone Number</label>
+                                <span id="detail-phone">-</span>
+                            </div>
+                        </div>
+
+                        <h4 class="details-divider-title">Employment Records</h4>
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <label><i class="fa-regular fa-calendar-check"></i> Date of Joining</label>
+                                <span id="detail-joining">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fa-solid fa-wallet"></i> Monthly Salary</label>
+                                <span id="detail-salary">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fa-solid fa-venus-mars"></i> Gender</label>
+                                <span id="detail-gender">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <label><i class="fa-solid fa-map-location-dot"></i> Physical Address</label>
+                                <span id="detail-address">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="close-details-footer-btn">Close Profile</button>
+                <button type="button" class="btn btn-primary" id="detail-edit-shortcut-btn">
+                    <span>Edit Profile</span>
+                    <i class="fa-solid fa-user-pen"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="confirm-modal" class="modal-overlay hidden">
+        <div class="modal-card alert-card-width">
+            <div class="modal-header alert-header">
+                <h3><i class="fa-solid fa-triangle-exclamation"></i> Warning: Destructive Action</h3>
+                <button class="modal-close-btn" id="close-confirm-modal-btn">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert-content">
+                    <p>Are you sure you want to delete this employee record?</p>
+                    <p class="alert-subtext">This will permanently delete the employee <strong id="delete-name-display">-</strong> (ID: <span id="delete-id-display">-</span>) and remove their information from Cloud Firestore. This action cannot be undone.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancel-delete-btn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+                    <span>Delete Record</span>
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Controller -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
